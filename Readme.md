@@ -105,7 +105,7 @@ $\frac{1}{4}\left(0+6+6+6\right) = \frac{9}{2}$
 ### Computing the Nash equilibrium strategy
 
 We are now ready to compute the Nash equilibrium strategy in the situation where every player cares only about points, not at all
-about cash, and every player knows that every other player feels this way.
+about cash (and where every player knows that every other player feels this way).
 
 Suppose that in Nash equilibrium, the probability of any player choosing to *not* eat the duck is $p$. Now take the perspective of one
 of the players. If this is a Nash equilibrium, there must be no incentive for this player to deviate from the Nash equilibrium strategy.
@@ -131,11 +131,40 @@ $p = \left(\frac{1}{2}\right)^{\frac{1}{3}} \approx 0.79$
 So in Nash equilibrium, each player should randomly choose not to eat their duck 79% of the time, and choose to eat their duck 21% of the time.
 
 This result aligns with our previous intuition that not eating the duck is a better option than eating it (even though you should 
-still eat it sometimes). It also means that we should expect about 1 of the 5 players to eat their duck. This makes sense. If we were very
+still eat it sometimes). It also means that we should expect about 1 of the 5 players to eat their duck in a typical game. This makes sense. If we were very
 confident that more than 1 player would eat their duck, then not eating the duck would become the best strategy. And if we were very confident
 that none of our opponents were going to eat their duck, then eating the duck would become our best strategy. It makes sense that the Nash equilibrium
 lies somewhere between these extremes.
 
+### The value of the game
+
+How much of a points advantage should each player expect to get, on average, in this equilibrium situation? Well, it had better be zero! This is 
+because the expected value of the game is the same for each player, and if the players only care about their points total relative to the other players,
+then the game is zero-sum (one player's advantage always comes at the other players' expense).
+
+You can verify that substituting $p = \left(\frac{1}{2}\right)^{\frac{1}{3}}$ back into the two expected value expressions for the two strategies does indeed
+give zero as expected.
+
+This will change when we consider players who value money as well as points. Then the game is no longer zero-sum (it is possible for the players 
+to collectively gain or lose money, while staying level on points).
+
 
 ## If *everyone* has the same conversion factor between points and money
 
+Next, we will consider the situation where players care about both money *and* points, but each player assigns exactly the *same* relative value
+to money and points (and as usual, every player is aware that this is true of every other player).
+
+Lets suppose that each player would be willing to lose $v$ points relative to all of the other players, in exchange for £25. This now sets the value
+for the situation where everyone eats the duck ($v$) and where everyone does not eat the duck ($-v$), since in each of these situations the relative 
+points differences among the players are unchanged.
+
+Since each player values points in the same way, the game still has a symmetry with respect to the 5 players, and we can analyse it in the same
+way we did in the previous section. The only change is that the polynomial expressions for the expected values now have shifted coefficients on the terms
+that correspond to everyone eating or not eating the duck.
+
+If you follow the algebra through, you will find the following modified equation for $p$ in Nash equilibrium:
+
+$1 - 2 p^3 = \frac{v}{6} \left(p^4 + (1-p)^4\right)$
+
+It is harder to write down the answer to this equation, but we can see that when $v$ is small, there will be a solution close to the one we had before.
+As $v$ grows, and players care relatively more about money, the solution becomes smaller. When $v = 6$, 

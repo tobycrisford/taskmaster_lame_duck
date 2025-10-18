@@ -97,7 +97,7 @@ The second assumption now allows us to conclude that all of the $c_{i}$ are equa
 And this single constant is irrelevant for determining the strategy with highest expected value, so we now have all we need.
 The value of an outcome is proportional to the sum of the relative points advantage over each opponent.
 
-We will pick the constant so that we assign value using the *average* points advantage. So we will say that the situation where you gain +5 and
+We will pick the constant so that we assign value using the *average* points advantage. So we will say that the situation where you gain 5 and
 everyone else loses 1 has value 6. A situation where you and another gain 3, and everyone else loses 3, has value:
 
 $\frac{1}{4}\left(0+6+6+6\right) = \frac{9}{2}$
@@ -155,16 +155,102 @@ Next, we will consider the situation where players care about both money *and* p
 to money and points (and as usual, every player is aware that this is true of every other player).
 
 Lets suppose that each player would be willing to lose $v$ points relative to all of the other players, in exchange for £25. This now sets the value
-for the situation where everyone eats the duck ($v$) and where everyone does not eat the duck ($-v$), since in each of these situations the relative 
-points differences among the players are unchanged.
+for the situation where everyone eats the duck (each player values this as $v$) and where everyone does not eat the duck (each player values this as $-v$),
+since in each of these situations the relative points differences among the players are unchanged, but they all receive (or all lose) £25.
 
-Since each player values points in the same way, the game still has a symmetry with respect to the 5 players, and we can analyse it in the same
-way we did in the previous section. The only change is that the polynomial expressions for the expected values now have shifted coefficients on the terms
-that correspond to everyone eating or not eating the duck.
+We can now try to find the Nash equilibrium again for this new game. We can apply the same method as the previous section. We assume that each player
+chooses not to eat the duck with probability $p$, and this value of $p$ is chosen so that no player has an incentive to deviate from this strategy.
+
+In the previous section, we only needed to consider values of $p$ which were strictly greater than 0 and less than 1, since it was clear that the situations
+where everyone eats or does not eat the duck were not stable. For this to be an equilibrium,
+it then had to be the case that both moves were equally valuable for each player (otherwise players could benefit by shifting the probability towards
+the more valuable move). But now, we need to consider the $p = 0$ case more carefully as well. It is possible for $p = 0$ to be an equilibrium if
+eating the duck is *more* valuable than not eating the duck for each player. And this will clearly be the case when $v \geq 6$. If each player values £25
+at least as much as they value a 6 points advantage relative to all other players, then the situation where everyone eats the duck and everyone receives
+£25 will also be a Nash equilibrium, where no one has any incentive to deviate.
+
+What about $0 < v < 6$? We can analyse this in the same way we did in the previous section. The only change is that the polynomial expressions for the
+expected values now have shifted coefficients on the terms that correspond to everyone eating or not eating their duck.
 
 If you follow the algebra through, you will find the following modified equation for $p$ in Nash equilibrium:
 
 $1 - 2 p^3 = \frac{v}{6} \left(p^4 + (1-p)^4\right)$
 
-It is harder to write down the answer to this equation, but we can see that when $v$ is small, there will be a solution close to the one we had before.
-As $v$ grows, and players care relatively more about money, the solution becomes smaller. When $v = 6$, 
+In order for both moves to be equally valuable to all players, $p$ must solve this equation.
+
+It is harder to write down a closed form anwer to this equation, but we can sketch some plots to understand what the solutions will look like
+for different values of $v$. We plot the LHS in blue and the RHS in orange.
+
+When $v$ is small, we only get a minor change to the result of the previous section. Nash equilibrium will occur when $p$ is slightly less than
+0.79:
+
+![v small](small_v_plot.png)
+
+As $v$ increases, we continue to get a unique solution for $p$ that decreases as $v$ increases, but stays larger than $1/2$, until $v$
+reaches the critical value of 6. It is easy to see by inspecting the equation that this is the critical value where the two curves intersect
+at $p = 0$ as well.
+
+![v critical](critical_v_plot.png)
+
+The $p = 0$ solution is the Nash equilibrium we had already found above, which we know continues to exist for all $v \geq 6$. But now we can see
+there is actually still a second Nash equilibrium as well, with $1/2 < p < (1/2)^{1/3}$.
+
+What does this mean? We brushed over this before, but it is not always true that a game has a unique Nash equilibrium. In such situations, it is not
+necessarily easy to say which Nash equilibrium strategy a rational player should follow. In this case though, the $p = 0$ strategy is strictly
+better for every player, so it seems reasonable to assume that they will follow that one! Why is it strictly better? Well, their expected points advantage
+under any strategy must be zero, by symmetry, and by the fact that points advantage is zero-sum. This means that 
+to find the value of the game, we just need to look at the expected value of the cash they receive. They are guaranteed to gain £25 under the $p = 0$
+equilibrium, while their expected cash is *negative* under the $p > 1/2$ strategy, since it is more likely that everyone will not eat the duck than
+that everyone will eat it.
+
+There are actually even more Nash equilibria in this game, even in the simpler $v = 0$ case, that we have sneakily brushed under the carpet so far.
+We did this when we made the assumption that every player will follow the same strategy (which we justified by symmetry). But technically,
+we could have imagined a scenario where the first player eats the duck with certainty, and every other player does not eat it with certainty.
+This is also a Nash equilibrium! No player is better off if they change their strategy! But we will continue to ignore these equilibria as well,
+until we tackle the situation where different players have different values, in which case we will be forced to consider that they might
+each follow different strategies.
+
+What happens when $v > 6$? We already know that we have a Nash equilibrium at $p = 0$, and that this will give the best results for each player,
+so that's the strategy we should expect them to follow. But it is interesting that we continue to have solutions to the above equation as well!
+There are now two $p > 0$ solutions, meaning that we have 3 symmetrical Nash equilibria in total!
+
+![v large](high_v_plot.png)
+
+We can see that this situation will continue as $v$ increases, until these two additional equilibria eventually collide with each other close to $p = 1/2$.
+After this, there will be no more solutions to the equation, and $p = 0$ will be the unique (symmetrical) equilibrium again.
+
+### Summary
+
+It is worth stepping back and summarising the optimum strategy for the case where everyone has the same conversion factor, $v$, between £25 and points.
+
+When $0 \leq v < 6$, players should choose to not eat the duck with some probability $p$ that is strictly greater than $\frac{1}{2}$.
+
+When $v \geq 6$, there is a sudden transition in optimum strategy. Players should now *always* eat the duck. Their relative points are unchanged,
+and they each receive £25. None of them have any incentive to deviate, since they value £25 more than a 6 points relative advantage.
+
+### The value of the game
+
+When $v \geq 6$ and $p = 0$, the value of the game is simply £25 for each player.
+
+Bur when $0 < v < 6$, the value of the game is now *negative* for each player.
+This is because they should each expect a 0 change in relative points advantage, by symmetry, but there is more chance that they will all lose
+£25 than that they will all win £25, since $p > \frac{1}{2}$. Unlike the previous section, the players now care about cash, so this situation
+is bad for them!
+
+This is interesting. If these players could just all agree to eat the duck, then they could each reveive £25. But instead, we are claiming they will follow
+a strategy that will *lose* them money in expectation. So how can we call this strategy the 'optimum' strategy?
+
+It is worth remembering why eating the duck cannot be the optimum strategy under our approach. The problem is that if you know everyone else is eating
+their duck, then you can make yourself better off by not eating yours (since you value a 6 points advantage more than £25).
+
+This is an example of a "prisoner's dilemma", a classic problem in game theory. If each player pursues their self-interest, then this leaves each of them
+worse off than if they had been able to agree to cooperate. Philosopher Derek Parfit would say that self-interest is "collectively directly self-defeating".
+ Cite. Some people have argued that faced with such situations, a truly rational agent should cooperate.. Cite.. But here we will take the conventional
+ approach.
+
+**Spoiler alert:** This dynamic is exactly what played out on the actual show! They quickly realised that if they could all agree to eat the duck, then there would be no change
+in their points relative to each other, and they could each be £25 richer. However, although each of them seemed to be agreeing to follow this approach,
+Reece "defected" by not eating his, as did Phil. This meant they received 3 points each and everyone else lost 3.
+
+## If each player has a different conversion factor between points and money, but the conversion factors are common knowledge
+

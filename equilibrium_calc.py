@@ -2,47 +2,35 @@ from typing import Callable
 import itertools
 
 
-class ValuePolynomialException(Exception):
+class OutcomePolynomialException(Exception):
     pass
 
 
-# TODO: Refactor so polynomial class has generic constructor (can be polynomial with generic coefficients, where each term is
-# products of p or (1-p) with p the free probabilities). Have current init as a special case class function.
-# Can then use this to do addition, which I will need. Also convert self.terms to dict to help with this!
+class OutcomePolynomial:
+    def __init__(self, coefs: dict[tuple[bool, ...], float]):
+        self.n_probs = -1
+        for k in coefs:
+            if self.n_probs == -1:
+                self.n_probs = len(k)
+            if len(k) != self.n_probs:
+                raise OutcomePolynomialException(
+                    "Inconsistent lengths among supplied coefficients"
+                )
 
+        if self.n_probs < 0:
+            raise OutcomePolynomialException("No coefficients supplied")
 
-class ValuePolynomial:
-    def __init__(
-        self,
-        fixed_probs: list[float],
-        n_free_probs: int,
-        value_function: Callable[[int], float],
-    ):
-        self.n_free_probs = n_free_probs
-        self.terms = []
-
-        for outcome in itertools.product(
-            [False, True], repeat=len(fixed_probs) + n_free_probs
-        ):
-            n_eaten = sum(outcome)
-            coef = value_function(n_eaten)
-            for i, p in enumerate(fixed_probs):
-                if outcome[i]:
-                    coef *= p
-                else:
-                    coef *= 1 - p
-
-            self.terms.append((coef, outcome[len(fixed_probs) :]))
+        self.terms = coefs
 
     def eval(self, probs: list[float]) -> float:
-        if len(probs) != self.n_free_probs:
-            raise ValuePolynomialException("Supplied probabilities have wrong length")
+        if len(probs) != self.n_probs:
+            raise OutcomePolynomialException("Supplied probabilities have wrong length")
 
         result = 0.0
 
-        for term in self.terms:
-            term_val = term[0]
-            for i, sel in enumerate(term[1]):
+        for outcome, coef in self.terms.items():
+            term_val = coef
+            for i, sel in enumerate(outcome):
                 if sel:
                     term_val *= probs[i]
                 else:
@@ -55,3 +43,18 @@ class ValuePolynomial:
     # TODO: Function for calculating derivative w.r.t each free prob
     def deriv(self, probs: list[float]) -> list[float]:
         pass
+
+
+def create_value_polynomial(
+    n_probs: int,
+    value_function: Callable[[int], float],
+) -> OutcomePolynomial:
+    coefs = {}
+
+    for outcome in itertools.product([False, True], repeat=n_probs):
+        n_eaten = sum(outcome)
+        coef = value_function(n_eaten)
+
+        coefs[outcome] = coef
+
+    return OutcomePolynomial(coefs)

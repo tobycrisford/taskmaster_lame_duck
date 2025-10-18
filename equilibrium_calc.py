@@ -1,10 +1,11 @@
 from typing import Callable
 import itertools
 
+import numpy as np
+
 
 class OutcomePolynomialException(Exception):
     pass
-
 
 class OutcomePolynomial:
     def __init__(self, coefs: dict[tuple[bool, ...], float]):
@@ -16,35 +17,54 @@ class OutcomePolynomial:
                 raise OutcomePolynomialException(
                     "Inconsistent lengths among supplied coefficients"
                 )
-
         if self.n_probs < 0:
             raise OutcomePolynomialException("No coefficients supplied")
 
+        self.outcome_to_index = {}
+        self.index_to_outcome = []
+        self.coef_array = np.zeros(2**(self.n_probs))
+        self.outcome_array = np.zeros((2**(self.n_probs), self.n_probs))
+        for i, outcome in enumerate(itertools.product([False, True], repeat=self.n_probs)):
+            self.index_to_outcome.append(outcome)
+            self.outcome_to_index[outcome] = i
+            self.outcome_array[i,:] = np.array(outcome)
+            if outcome in coefs:
+                self.coef_array[i] = coefs[outcome]
+
         self.terms = coefs
 
-    def eval(self, probs: list[float]) -> float:
+    def _poly_eval(self, probs: np.ndarray, outcome_array: np.ndarray, coef_array: np.ndarray) -> np.ndarray:
+        n_probs = len(probs)
+
+        relevant_probs = probs.reshape((1, n_probs)) * outcome_array + (1 - probs).reshape((1, n_probs)) * (1 - outcome_array)
+        return np.sum(np.prod(relevant_probs, axis=1) * coef_array)
+    
+    def eval(self, probs: np.ndarray) -> float:
         if len(probs) != self.n_probs:
             raise OutcomePolynomialException("Supplied probabilities have wrong length")
 
-        result = 0.0
+        return self._poly_eval(probs, self.outcome_array, self.coef_array)
 
-        for outcome, coef in self.terms.items():
-            term_val = coef
-            for i, sel in enumerate(outcome):
-                if sel:
-                    term_val *= probs[i]
-                else:
-                    term_val *= 1 - probs[i]
+    def deriv(self, probs: np.ndarray) -> np.ndarray:
+        if len(probs) != self.n_probs:
+            raise OutcomePolynomialException("Supplied probabilities have wrong length")
 
-            result += term_val
+        partial_derivs = []
+        mask = np.full(self.n_probs, True)
+        for i in range(self.n_probs):
+            mask[i] = False
+            deriv_coefs = self.coef_array * (self.outcome_array[:, i] * 2 - 1)
+            partial_derivs.append(
+                self._poly_eval(
+                    probs[mask],
+                    self.outcome_array[:, mask],
+                    deriv_coefs,
+                )
+            )
+            mask[i] = True
 
-        return result
-
-    # TODO: Function for calculating derivative w.r.t each free prob
-    def deriv(self, probs: list[float]) -> list[float]:
-        pass
-
-
+        return np.array(partial_derivs)
+            
 def create_value_polynomial(
     n_probs: int,
     value_function: Callable[[int], float],

@@ -16,4 +16,8 @@ PyQt5_sip==12.17.1
 python-dateutil==2.9.0.post0
 ruff==0.14.0
 six==1.17.0
+tqdm==4.67.1
+types-requests==2.32.4.20250913
+types-tqdm==4.67.0.20250809
 typing_extensions==4.15.0
+urllib3==2.5.0

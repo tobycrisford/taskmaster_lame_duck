@@ -2,6 +2,7 @@ from typing import Callable
 import itertools
 
 import numpy as np
+from tqdm import tqdm
 
 DEFAULT_TOLERANCE = 10 ** (-6)
 
@@ -239,14 +240,13 @@ def solve(
     return soln, soln * eat_values + (1 - soln) * not_eat_values
 
 
-def find_all_valid_solutions(
+def find_non_boundary_valid_solutions(
     cash_to_points_conversions: list[int],
     n_trials: int = 1000,
     tolerance: float = DEFAULT_TOLERANCE,
 ) -> list[tuple[np.ndarray, np.ndarray]]:
     solns: list[tuple[np.ndarray, np.ndarray]] = []
-    for _ in range(n_trials):
-        print(_)
+    for _ in tqdm(range(n_trials)):
         try:
             soln, soln_value = solve(
                 cash_to_points_conversions,

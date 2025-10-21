@@ -173,11 +173,13 @@ def newton_rhapson_prep(
 
 def create_equations_from_values(
     cash_to_points_conversions: list[int],
-) -> list[OutcomePolynomial]:
+) -> tuple[list[OutcomePolynomial], list[OutcomePolynomial], list[OutcomePolynomial]]:
+    """Return equations to be solved, along with value equations for each player."""
+
     player_values = [
         PlayerValue(conversion) for conversion in cash_to_points_conversions
     ]
-    return [
+    equal_value_eqns = [
         equal_value_eqn(
             len(player_values) - 1,
             player.eat_value,
@@ -185,6 +187,16 @@ def create_equations_from_values(
         )
         for player in player_values
     ]
+    eat_value_polynomial = [
+        create_value_polynomial(len(player_values) - 1, player.eat_value)
+        for player in player_values
+    ]
+    not_eat_value_polynomial = [
+        create_value_polynomial(len(player_values) - 1, player.not_eat_value)
+        for player in player_values
+    ]
+
+    return equal_value_eqns, eat_value_polynomial, not_eat_value_polynomial
 
 
 class NRConvergenceError(Exception):
@@ -196,8 +208,12 @@ def solve(
     starting_probs: np.ndarray,
     tolerance: float = DEFAULT_TOLERANCE,
     iteration_limit: int = 1000,
-) -> np.ndarray:
-    eqns = create_equations_from_values(cash_to_points_conversions)
+) -> tuple[np.ndarray, np.ndarray]:
+    """Find probabilities that solve equilibrium equations, along with value of game for each player."""
+
+    eqns, eat_value_polys, not_eat_value_polys = create_equations_from_values(
+        cash_to_points_conversions
+    )
     soln = np.copy(starting_probs)
 
     soln_found = False
@@ -214,19 +230,25 @@ def solve(
             f"Solution did not converge in {iteration_limit} iterations."
         )
 
-    return soln
+    _, eat_values = newton_rhapson_prep(eat_value_polys, soln)
+    eat_values *= -1.0
+
+    _, not_eat_values = newton_rhapson_prep(not_eat_value_polys, soln)
+    not_eat_values *= -1.0
+
+    return soln, soln * eat_values + (1 - soln) * not_eat_values
 
 
 def find_all_valid_solutions(
     cash_to_points_conversions: list[int],
     n_trials: int = 1000,
     tolerance: float = DEFAULT_TOLERANCE,
-) -> list[np.ndarray]:
-    solns: list[np.ndarray] = []
+) -> list[tuple[np.ndarray, np.ndarray]]:
+    solns: list[tuple[np.ndarray, np.ndarray]] = []
     for _ in range(n_trials):
         print(_)
         try:
-            soln = solve(
+            soln, soln_value = solve(
                 cash_to_points_conversions,
                 np.random.rand(len(cash_to_points_conversions)),
             )
@@ -236,9 +258,10 @@ def find_all_valid_solutions(
         if np.any(soln > 1.0 + tolerance) or np.any(soln < 0.0 - tolerance):
             continue
         if any(
-            np.all(np.abs(soln - existing_soln) < tolerance) for existing_soln in solns
+            np.all(np.abs(soln - existing_soln) < tolerance)
+            for existing_soln, __ in solns
         ):
             continue
-        solns.append(soln)
+        solns.append((soln, soln_value))
 
     return solns

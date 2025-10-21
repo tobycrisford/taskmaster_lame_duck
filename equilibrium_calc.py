@@ -183,3 +183,21 @@ def create_equations_from_values(
         )
         for player in player_values
     ]
+
+
+def solve(
+    cash_to_points_conversions: list[int],
+    starting_probs: np.ndarray,
+    tolerance: float = 10 ** (-6),
+) -> np.ndarray:
+    eqns = create_equations_from_values(cash_to_points_conversions)
+    soln = np.copy(starting_probs)
+
+    while True:
+        deriv, rhs = newton_rhapson_prep(eqns, soln)
+        if np.all(np.abs(rhs) < tolerance):
+            break
+        update = np.linalg.solve(deriv, rhs)
+        soln += update
+
+    return soln

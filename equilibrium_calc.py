@@ -3,6 +3,8 @@ import itertools
 
 import numpy as np
 
+DEFAULT_TOLERANCE = 10 ** (-6)
+
 
 class OutcomePolynomialException(Exception):
     pass
@@ -185,19 +187,58 @@ def create_equations_from_values(
     ]
 
 
+class NRConvergenceError(Exception):
+    pass
+
+
 def solve(
     cash_to_points_conversions: list[int],
     starting_probs: np.ndarray,
-    tolerance: float = 10 ** (-6),
+    tolerance: float = DEFAULT_TOLERANCE,
+    iteration_limit: int = 1000,
 ) -> np.ndarray:
     eqns = create_equations_from_values(cash_to_points_conversions)
     soln = np.copy(starting_probs)
 
-    while True:
+    soln_found = False
+    for _ in range(iteration_limit):
         deriv, rhs = newton_rhapson_prep(eqns, soln)
         if np.all(np.abs(rhs) < tolerance):
+            soln_found = True
             break
         update = np.linalg.solve(deriv, rhs)
         soln += update
 
+    if not soln_found:
+        raise NRConvergenceError(
+            f"Solution did not converge in {iteration_limit} iterations."
+        )
+
     return soln
+
+
+def find_all_valid_solutions(
+    cash_to_points_conversions: list[int],
+    n_trials: int = 1000,
+    tolerance: float = DEFAULT_TOLERANCE,
+) -> list[np.ndarray]:
+    solns: list[np.ndarray] = []
+    for _ in range(n_trials):
+        print(_)
+        try:
+            soln = solve(
+                cash_to_points_conversions,
+                np.random.rand(len(cash_to_points_conversions)),
+            )
+        except (np.linalg.LinAlgError, NRConvergenceError):
+            # Occurs when matrix is singular
+            continue
+        if np.any(soln > 1.0 + tolerance) or np.any(soln < 0.0 - tolerance):
+            continue
+        if any(
+            np.all(np.abs(soln - existing_soln) < tolerance) for existing_soln in solns
+        ):
+            continue
+        solns.append(soln)
+
+    return solns

@@ -230,7 +230,7 @@ def solve(
         if np.all(np.abs(rhs[mask]) < tolerance):
             soln_found = True
             break
-        update = np.linalg.solve(deriv[mask, mask], rhs[mask])
+        update = np.linalg.solve(deriv[mask][:, mask], rhs[mask])
         soln[mask] += update
 
     if not soln_found:
@@ -251,11 +251,11 @@ class EquilibriumCalcException(Exception):
     pass
 
 
-def find_valid_solutions(
+def find_all_potential_solutions(
     cash_to_points_conversions: list[int],
     fixed_zeros: Sequence[int],
     fixed_ones: Sequence[int],
-    n_trials: int = 1000,
+    n_trials: int = 100,
     tolerance: float = DEFAULT_TOLERANCE,
 ) -> list[tuple[np.ndarray, np.ndarray, np.ndarray]]:
     exclude_indices = set(fixed_ones).union(set(fixed_zeros))
@@ -263,7 +263,7 @@ def find_valid_solutions(
         raise EquilibriumCalcException("Overlap between fixed ones and fixed zeros")
 
     solns: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
-    for _ in tqdm(range(n_trials)):
+    for _ in range(n_trials):
         initialization_vec = np.random.rand(len(cash_to_points_conversions))
         for idx in fixed_zeros:
             initialization_vec[idx] = 0.0
@@ -290,6 +290,38 @@ def find_valid_solutions(
     return solns
 
 
-# def find_all_valid_solutions(cash_to_points_conversions: list[int]) -> list[tuple[np.ndarray, np.ndarray]]:
+def find_all_valid_solutions(
+    cash_to_points_conversions: list[int], tolerance: float = DEFAULT_TOLERANCE
+) -> list[tuple[np.ndarray, np.ndarray, np.ndarray]]:
+    valid_solns = []
+    for boundary_region in tqdm(
+        itertools.product([None, 0, 1], repeat=PlayerValue.N_PLAYERS),
+        total=3**PlayerValue.N_PLAYERS,
+    ):
+        fixed_zeros = []
+        fixed_ones = []
+        for idx, val in enumerate(boundary_region):
+            if val == 0:
+                fixed_zeros.append(idx)
+            elif val == 1:
+                fixed_ones.append(idx)
 
-#    for boundary_region in itertools.product([None, 0.0, 1.0], repeat = PlayerValue.N_PLAYERS):
+        solns = find_all_potential_solutions(
+            cash_to_points_conversions, fixed_zeros, fixed_ones
+        )
+
+        for soln, eat_value, not_eat_value in solns:
+            valid = True
+            if any(
+                eat_value[idx] > not_eat_value[idx] + tolerance for idx in fixed_zeros
+            ):
+                valid = False
+            elif any(
+                not_eat_value[idx] > eat_value[idx] + tolerance for idx in fixed_ones
+            ):
+                valid = False
+
+            if valid:
+                valid_solns.append((soln, eat_value, not_eat_value))
+
+    return valid_solns

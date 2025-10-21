@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Iterable, Sequence
 import itertools
 
 import numpy as np
@@ -209,22 +209,29 @@ def solve(
     starting_probs: np.ndarray,
     tolerance: float = DEFAULT_TOLERANCE,
     iteration_limit: int = 1000,
-) -> tuple[np.ndarray, np.ndarray]:
+    exclude_indices: Iterable[int] | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Find probabilities that solve equilibrium equations, along with value of game for each player."""
+
+    mask = np.full(len(starting_probs), True)
+    if exclude_indices is not None:
+        for idx in exclude_indices:
+            mask[idx] = False
 
     eqns, eat_value_polys, not_eat_value_polys = create_equations_from_values(
         cash_to_points_conversions
     )
+
     soln = np.copy(starting_probs)
 
     soln_found = False
     for _ in range(iteration_limit):
         deriv, rhs = newton_rhapson_prep(eqns, soln)
-        if np.all(np.abs(rhs) < tolerance):
+        if np.all(np.abs(rhs[mask]) < tolerance):
             soln_found = True
             break
-        update = np.linalg.solve(deriv, rhs)
-        soln += update
+        update = np.linalg.solve(deriv[mask, mask], rhs[mask])
+        soln[mask] += update
 
     if not soln_found:
         raise NRConvergenceError(
@@ -237,20 +244,36 @@ def solve(
     _, not_eat_values = newton_rhapson_prep(not_eat_value_polys, soln)
     not_eat_values *= -1.0
 
-    return soln, soln * eat_values + (1 - soln) * not_eat_values
+    return soln, eat_values, not_eat_values
 
 
-def find_non_boundary_valid_solutions(
+class EquilibriumCalcException(Exception):
+    pass
+
+
+def find_valid_solutions(
     cash_to_points_conversions: list[int],
+    fixed_zeros: Sequence[int],
+    fixed_ones: Sequence[int],
     n_trials: int = 1000,
     tolerance: float = DEFAULT_TOLERANCE,
-) -> list[tuple[np.ndarray, np.ndarray]]:
-    solns: list[tuple[np.ndarray, np.ndarray]] = []
+) -> list[tuple[np.ndarray, np.ndarray, np.ndarray]]:
+    exclude_indices = set(fixed_ones).union(set(fixed_zeros))
+    if len(exclude_indices) < len(fixed_ones) + len(fixed_zeros):
+        raise EquilibriumCalcException("Overlap between fixed ones and fixed zeros")
+
+    solns: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
     for _ in tqdm(range(n_trials)):
+        initialization_vec = np.random.rand(len(cash_to_points_conversions))
+        for idx in fixed_zeros:
+            initialization_vec[idx] = 0.0
+        for idx in fixed_ones:
+            initialization_vec[idx] = 1.0
         try:
-            soln, soln_value = solve(
+            soln, eat_value, not_eat_value = solve(
                 cash_to_points_conversions,
-                np.random.rand(len(cash_to_points_conversions)),
+                initialization_vec,
+                exclude_indices=exclude_indices,
             )
         except (np.linalg.LinAlgError, NRConvergenceError):
             # Occurs when matrix is singular
@@ -259,9 +282,14 @@ def find_non_boundary_valid_solutions(
             continue
         if any(
             np.all(np.abs(soln - existing_soln) < tolerance)
-            for existing_soln, __ in solns
+            for existing_soln, __, ___ in solns
         ):
             continue
-        solns.append((soln, soln_value))
+        solns.append((soln, eat_value, not_eat_value))
 
     return solns
+
+
+# def find_all_valid_solutions(cash_to_points_conversions: list[int]) -> list[tuple[np.ndarray, np.ndarray]]:
+
+#    for boundary_region in itertools.product([None, 0.0, 1.0], repeat = PlayerValue.N_PLAYERS):

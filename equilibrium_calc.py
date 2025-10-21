@@ -77,8 +77,8 @@ class OutcomePolynomial:
         for terms in (self.terms, other_polynomial.terms):
             for k in terms:
                 if k not in summed_coefs:
-                    summed_coefs = terms[k]
-                summed_coefs += terms[k]
+                    summed_coefs[k] = terms[k]
+                summed_coefs[k] += terms[k]
 
         return OutcomePolynomial(summed_coefs)
 
@@ -98,7 +98,7 @@ def create_value_polynomial(
     return OutcomePolynomial(coefs)
 
 
-def test_value_fn(n_eaten: int) -> float:
+def eat_value(n_eaten: int) -> float:
     if n_eaten == 0:
         return 6
     elif n_eaten == 1:
@@ -110,4 +110,30 @@ def test_value_fn(n_eaten: int) -> float:
     elif n_eaten == 4:
         return 0
     else:
-        raise NotImplementedError()
+        raise ValueError("n_eaten does not have allowed value")
+
+
+def not_eat_value(n_eaten: int) -> float:
+    if n_eaten == 0:
+        return 0
+    elif n_eaten == 1:
+        return -1 * (6 / 4)
+    elif n_eaten == 2:
+        return (2 * 6) / 4
+    elif n_eaten == 3:
+        return (3 * 6) / 4
+    elif n_eaten == 4:
+        return 6
+    else:
+        raise ValueError("n_eaten does not have allowed value")
+
+
+def equal_value_eqn() -> OutcomePolynomial:
+    N_PROBS = 4
+    LHS = eat_value
+    RHS = not_eat_value
+
+    return create_value_polynomial(N_PROBS, LHS) + create_value_polynomial(
+        N_PROBS,
+        lambda x: -1 * RHS(x),
+    )

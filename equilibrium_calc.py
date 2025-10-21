@@ -98,42 +98,88 @@ def create_value_polynomial(
     return OutcomePolynomial(coefs)
 
 
-def eat_value(n_eaten: int) -> float:
-    if n_eaten == 0:
-        return 6
-    elif n_eaten == 1:
-        return -1 * ((3 * 6) / 4)
-    elif n_eaten == 2:
-        return -1 * ((2 * 6) / 4)
-    elif n_eaten == 3:
-        return -1 * (6 / 4)
-    elif n_eaten == 4:
-        return 0
-    else:
-        raise ValueError("n_eaten does not have allowed value")
+class PlayerValue:
+    """Player's value function for the Lame duck game played on show.
+    Allow arbitrary conversion factor between £25 and points.
+    """
+
+    N_PLAYERS = 5
+
+    def __init__(self, cash_to_points_conversion: float):
+        self.cash_to_points_conversion = cash_to_points_conversion
+
+    def eat_value(self, n_eaten: int) -> float:
+        if n_eaten == 0:
+            return 6
+        elif n_eaten == 1:
+            return -1 * ((3 * 6) / 4)
+        elif n_eaten == 2:
+            return -1 * ((2 * 6) / 4)
+        elif n_eaten == 3:
+            return -1 * (6 / 4)
+        elif n_eaten == 4:
+            return self.cash_to_points_conversion
+        else:
+            raise ValueError("n_eaten does not have allowed value")
+
+    def not_eat_value(self, n_eaten: int) -> float:
+        if n_eaten == 0:
+            return -1 * self.cash_to_points_conversion
+        elif n_eaten == 1:
+            return -1 * (6 / 4)
+        elif n_eaten == 2:
+            return (2 * 6) / 4
+        elif n_eaten == 3:
+            return (3 * 6) / 4
+        elif n_eaten == 4:
+            return 6
+        else:
+            raise ValueError("n_eaten does not have allowed value")
 
 
-def not_eat_value(n_eaten: int) -> float:
-    if n_eaten == 0:
-        return 0
-    elif n_eaten == 1:
-        return -1 * (6 / 4)
-    elif n_eaten == 2:
-        return (2 * 6) / 4
-    elif n_eaten == 3:
-        return (3 * 6) / 4
-    elif n_eaten == 4:
-        return 6
-    else:
-        raise ValueError("n_eaten does not have allowed value")
-
-
-def equal_value_eqn() -> OutcomePolynomial:
-    N_PROBS = 4
-    LHS = eat_value
-    RHS = not_eat_value
-
-    return create_value_polynomial(N_PROBS, LHS) + create_value_polynomial(
-        N_PROBS,
-        lambda x: -1 * RHS(x),
+def equal_value_eqn(
+    n_probs: int, value_a: Callable[[int], float], value_b: Callable[[int], float]
+) -> OutcomePolynomial:
+    return create_value_polynomial(n_probs, value_a) + create_value_polynomial(
+        n_probs,
+        lambda x: -1 * value_b(x),
     )
+
+
+def newton_rhapson_prep(
+    lhs: list[OutcomePolynomial], all_probs: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Given an eqn of form lhs=0, with ith eqn having ith prob ommitted, return the derivative matrix
+    and rhs vector for NR linear solve step.
+    """
+
+    vec_elements = []
+    deriv_rows = []
+    mask = np.full(len(all_probs), True)
+    for i, lhs_row in enumerate(lhs):
+        mask[i] = False
+        relevant_probs = all_probs[mask]
+        vec_elements.append(-1 * lhs_row.eval(relevant_probs))
+        deriv_row = lhs_row.deriv(relevant_probs)
+        deriv_row_list = list(deriv_row[:i]) + [0.0] + list(deriv_row[i:])
+        deriv_rows.append(deriv_row_list)
+
+        mask[i] = True
+
+    return np.array(deriv_rows), np.array(vec_elements)
+
+
+def create_equations_from_values(
+    cash_to_points_conversions: list[int],
+) -> list[OutcomePolynomial]:
+    player_values = [
+        PlayerValue(conversion) for conversion in cash_to_points_conversions
+    ]
+    return [
+        equal_value_eqn(
+            len(player_values) - 1,
+            player.eat_value,
+            player.not_eat_value,
+        )
+        for player in player_values
+    ]

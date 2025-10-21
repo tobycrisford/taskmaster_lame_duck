@@ -112,7 +112,7 @@ of the players. If this is a Nash equilibrium, there must be no incentive for th
 And for this to be the case, the expected value of eating the duck must be the same as the expected value of not eating the duck. This constraint
 gives us a polynomial equation in $p$ which we will be able to solve.
 
-$E(\text{eating duck}) = (6) p^{4} + {{4}\choose{1}}(\frac{-3.6}{4}) p^3 (1-p) + {{4}\choose{2}} (\frac{-2.6}{4}) p^2 (1-p)^2 + {{4}\choose{3}} (\frac{-6}{4}) p (1-p)^3 + (0) p^4$
+$E(\text{eating duck}) = (6) p^{4} + {{4}\choose{1}}(\frac{-3.6}{4}) p^3 (1-p) + {{4}\choose{2}} (\frac{-2.6}{4}) p^2 (1-p)^2 + {{4}\choose{3}} (\frac{-6}{4}) p (1-p)^3 + (0) (1-p)^4$
 
 $E(\text{not eating duck}) = (0) p^{4} + {{4}\choose{1}} (\frac{-6}{4}) p^3 (1-p) + {{4}\choose{2}} (\frac{2.6}{4}) p^2 (1-p)^2 + {{4}\choose{3}} (\frac{3.6}{4}) p (1 - p)^3 + (6) (1-p)^4$
 

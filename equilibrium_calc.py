@@ -77,7 +77,7 @@ class OutcomePolynomial:
         for terms in (self.terms, other_polynomial.terms):
             for k in terms:
                 if k not in summed_coefs:
-                    summed_coefs[k] = terms[k]
+                    summed_coefs[k] = 0.0
                 summed_coefs[k] += terms[k]
 
         return OutcomePolynomial(summed_coefs)

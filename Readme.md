@@ -254,3 +254,14 @@ Reece "defected" by not eating his, as did Phil. This meant they received 3 poin
 
 ## If each player has a different conversion factor between points and money, but the conversion factors are common knowledge
 
+What if the different players value money differently?
+
+First, if $v \geq 6$ for every player, then it makes no difference if their values are not identical. Each player should eat their duck. It is clear that this is a Nash equilibrium. No one can benefit by changing their strategy, since they each value £25 more than they value a 6 points advantage over all the other players. And it is the "best" equilibrium, since each player gets the maximum possible payoff. The interesting situations are therefore those in which at least one player has $0 \leq v < 6$.
+
+The script equilibrium_calc.py finds all of the Nash equilibria for an arbitrary set of conversion factors, $v_i$. As soon as we allow different conversion factors for the different players, the game becomes far more complex. We have so far restricted to considering only symmetric equilibria, and with this restriction, it has always been possible to figure out which equilibrium solution the players should adopt. But now, the players are no longer identical, and the symmetry is broken. It will therefore become harder to say which of the many Nash equilibria a rational player should follow.
+
+### If one player cares slightly about money, but the rest care only about points
+
+### If only one player has $v < 6$ and the rest care only about money (almost)
+
+### If the $v_i$ are spread evenly throughout the range [0, 6)

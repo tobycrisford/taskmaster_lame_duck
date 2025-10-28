@@ -256,11 +256,25 @@ Reece "defected" by not eating his, as did Phil. This meant they received 3 poin
 
 What if the different players value money differently?
 
-First, if $v \geq 6$ for every player, then it makes no difference if their values are not identical. Each player should eat their duck. It is clear that this is a Nash equilibrium. No one can benefit by changing their strategy, since they each value £25 more than they value a 6 points advantage over all the other players. And it is the "best" equilibrium, since each player gets the maximum possible payoff. The interesting situations are therefore those in which at least one player has $0 \leq v < 6$.
+As soon as we allow different conversion factors for the different players, the game becomes far more complex. We have so far restricted to considering only symmetric equilibria (where each player follows an identical strategy), and with this restriction, it has always been possible to figure out which equilibrium solution the players should adopt. But now, the players' payoffs are no longer identical, so their strategies should not be either. We are forced to consider all the Nash equilibria which exist in the game, including strange ones (e.g. one player always eats the duck and the others all do not eat it). It will become harder to say which of the many possible Nash equilibria a rational player should follow.
 
-The script equilibrium_calc.py finds all of the Nash equilibria for an arbitrary set of conversion factors, $v_i$. As soon as we allow different conversion factors for the different players, the game becomes far more complex. We have so far restricted to considering only symmetric equilibria, and with this restriction, it has always been possible to figure out which equilibrium solution the players should adopt. But now, the players are no longer identical, and the symmetry is broken. It will therefore become harder to say which of the many Nash equilibria a rational player should follow.
+There are still some boring situations. First, if $v \geq 6$ for every player, then it makes no difference if their values are not identical. Each player should eat their duck. It is clear that this is a Nash equilibrium. No one can benefit by changing their strategy, since they each value £25 more than they value a 6 points advantage over all the other players. And it is also the "best" equilibrium, since each player gets the maximum possible payoff. The more interesting situations are therefore those in which at least one player has $0 \leq v < 6$.
+
+The script equilibrium_calc.py finds all of the Nash equilibria for an arbitrary set of conversion factors, $v_i$. This logic has been rewritten in javascript, and provides the strategies for the browser based game contained in this repo (to follow!) Here, we discuss some interesting special cases.
 
 ### If one player cares slightly about money, but the rest care only about points
+
+Suppose that the first 4 players have $v = 0$ but the 5th player is willing to trade points for money as long as the price is high enough (lets say $v = 1$ so that they are willing to give up a single point if paid £25). We already saw that if all players have $v = 0$, then there is a Nash equilibrium where every player eats the duck with probability $0.21$. What happens to this equilibirum if the 6th player's values change to $v=1$ while the rest remain unchanged?
+
+Naively, we might expect the 5th player to adopt a higher probability of eating their duck, since they are now more interested in achieving the £25 payoff (which occurs if everyone eats their duck) and avoiding the £25 loss (which occurs if everyone does not). But surprisingly, the result is actually the exact opposite! If $v_i=0$ for the first 4 players and $v_5=1$, then the this equilibrium shifts so that the first 4 players eat their duck with probability $0.22$ (slightly higher) and the 5th player eats their duck with reduced probability $0.16$.
+
+Why is it this way round? Well, consider the perspective of the 5th player. We need eating the duck and not eating the duck to be equally valuable moves for them. The fact they now value money as well as points means that eating the duck has become more valuable than it was before. In order to bring the value of the two moves in line again, the other 4 players must *increase* the probability that they eat their duck, which makes this move less attractive for the 5th player. From the perspective of the other players, for their moves to still be equally valuable, the 5th player's probability of eating their duck must *decrease*.
+
+Of course, there are plenty of other Nash equilibria as well (31 in total) but this particular one is interesting because it comes from the equilibrium solution that we discussed above. It is also symmetric among the 4 players with the same values (whereas most of the others are not).
+
+The value of the game is very slightly negative for the 4 $v = 0$ players (-0.006), implying that they will lose points, on average, to the 5th player. And it is also significantly negative (-0.28) for the 5th player, since there is a significant risk that everyone will lose £25 (which outweighs their slight gain in points).
+
+This is interesting! Making one of the players care slightly less about points vs money has, counter-intuitively, meant that that player now ends up with more points!
 
 ### If only one player has $v < 6$ and the rest care only about money (almost)
 

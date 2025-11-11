@@ -278,12 +278,12 @@ This is interesting! Making one of the players care slightly less about points v
 
 ### If only one player has $v < 6$ and the rest care only about money (almost)
 
-If a player cares *only* about money, then we already figured out how they should play the game. They should always eat the duck, since this sometimes improves their situation and never makes it worse. So if a single player who values points is faced with 4 opponents who all *only* care about money, their strategy is then straightforward: they should not eat their duck.
+If a player cares *only* about money, then we already figured out how they should play the game. They should always eat the duck, since this sometimes improves their situation and never makes it worse. So if a single player who values points is faced with 4 opponents who all *only* care about money, their strategy is then straightforward: they should not eat their duck, while the other players all eat theirs.
 
-But what about if the other players care about points just a little bit? Maybe they have something like $v = 100$. There are only two Nash equilibria with identical strategies for each of the $v = 100$ players. One is the boring one where they all never eat the duck and the first player always does. But the other is a strategy where the first player eats the duck with probability $0.93$ and the four money-valuing players eat the duck with probability only $0.21$.
+But what about if the other players care about points just a little bit? Maybe they have something like $v = 100$. There are only two Nash equilibria which involve identical strategies for each of the $v = 100$ players. One is the boring one, where they all never eat the duck and the first player always does. But the other is a strategy where the first player eats the duck with probability $0.93$ and the four money-valuing players eat the duck with probability only $0.21$.
 
-This is again pretty odd! Things are again the opposite way around to what you might expect (and the opposite way around to the sitation where the 4 players *only* value money). It is again the player who cares more about points who will eat their duck more often.
+This is again pretty odd! It is again the player who cares more about points who will eat their duck more often!
 
-To figure out: in the limit $v \rightarrow \infty$ does this equilibria approach $(1,0,0,0,0)$?
+In the limit $v \rightarrow \infty$, duck-eating probability of first player approaches 1, while probabilities of the other 4 stay at $0.21$.... TODO: explanation
 
 ### If the $v_i$ are spread evenly throughout the range [0, 6)

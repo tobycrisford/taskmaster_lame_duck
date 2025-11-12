@@ -238,7 +238,7 @@ This is because they should each expect a 0 change in relative points advantage,
 is bad for them!
 
 This is interesting. If these players could just all agree to eat the duck, then they could each reveive £25. But instead, we are claiming they will follow
-a strategy that will *lose* them money in expectation. So how can we call this strategy the 'optimum' strategy?
+a strategy that will *lose* them money in expectation, and gain them no points. So how can we call this strategy the 'optimum' strategy?
 
 It is worth remembering why eating the duck cannot be the optimum strategy under our approach. The problem is that if you know everyone else is eating
 their duck, then you can make yourself better off by not eating yours (since you value a 6 points advantage more than £25).
@@ -270,7 +270,7 @@ Naively, we might expect the 5th player to adopt a higher probability of eating 
 
 Why is it this way round? Well, consider the perspective of the 5th player. We need eating the duck and not eating the duck to be equally valuable moves for them. The fact they now value money as well as points means that eating the duck has become more valuable than it was before. In order to bring the value of the two moves in line again, the other 4 players must *increase* the probability that they eat their duck, which makes this move less attractive for the 5th player. From the perspective of the other players, for their moves to still be equally valuable, the 5th player's probability of eating their duck must *decrease*.
 
-Of course, there are plenty of other Nash equilibria as well (31 in total) but this particular one is interesting because it comes from the equilibrium solution that we discussed above. It is also symmetric among the 4 players with the same values (whereas most of the others are not).
+Of course, there are plenty of other Nash equilibria as well (31 in total) but this particular one is interesting because it arises as a continuous deformation of the equilibrium solution that we discussed above. It is also symmetric among the 4 players with the same values (whereas most of the others are not).
 
 The value of the game is very slightly negative for the 4 $v = 0$ players (-0.006), implying that they will lose points, on average, to the 5th player. And it is also significantly negative (-0.28) for the 5th player, since there is a significant risk that everyone will lose £25 (which outweighs their slight gain in points).
 
@@ -280,10 +280,24 @@ This is interesting! Making one of the players care slightly less about points v
 
 If a player cares *only* about money, then we already figured out how they should play the game. They should always eat the duck, since this sometimes improves their situation and never makes it worse. So if a single player who values points is faced with 4 opponents who all *only* care about money, their strategy is then straightforward: they should not eat their duck, while the other players all eat theirs.
 
-But what about if the other players care about points just a little bit? Maybe they have something like $v = 100$. There are only two Nash equilibria which involve identical strategies for each of the $v = 100$ players. One is the boring one, where they all never eat the duck and the first player always does. But the other is a strategy where the first player eats the duck with probability $0.93$ and the four money-valuing players eat the duck with probability only $0.21$.
+But what about if the other players care about points just a little bit? Maybe they have something like $v = 100$. There are only two Nash equilibria which involve identical strategies for each of the $v = 100$ players. One is the boring one, where they all never eat the duck and the first player always does. But the other is a strategy where the first player eats the duck with probability $0.93$ and the four money-valuing players eat the duck with probability only $0.21$ (the same value as in the case where all players only care about points!)
 
 This is again pretty odd! It is again the player who cares more about points who will eat their duck more often!
 
-In the limit $v \rightarrow \infty$, duck-eating probability of first player approaches 1, while probabilities of the other 4 stay at $0.21$.... TODO: explanation
+What about if we make $v$ even bigger?
+
+The probability of the 4 money-valuing players eating the duck will be held fixed at $0.21 = 1 - \left(\frac{1}{2}\right)^{1/3}$ as $v$ increases, since this is the value which makes both moves equally valuable for the first player (and the first player's values are independent of $v$). It is the same pobability we found for eating the duck in the game where all players only care about points. But the probability of the first player eating the duck increases, until at some point, for very large $v$, it will hit 1, and after that this equilibrium solution will disappear. It cannot be maintained for arbitrarily large $v$ since if we consider only the $v$ terms in the value function (corresponding to all players doing the same thing) then eating the duck is always the better strategy for the remaining 4 players (it has positive expected value while not-eating the duck has negative expected value).
 
 ### If the $v_i$ are spread evenly throughout the range [0, 6)
+
+Suppose we take 5 different $v$ values: $1, 2, 3, 4, 5$. We find an equilibrium with probabilities: $0.35, 0.30, 0.25, 0.20, 0.15$.
+
+Again, it is the players who value cash less who end up adopting higher probabilities of eating their duck.
+
+## If players don't know the conversion factors of their opponents
+
+The final simplifying assumption that we might consider relaxing is the assumption that everyone's value functions are *common knowledge*. It is natural to ask what would happen in a more realistic situation where this was not the case. Perhaps each player has some subjective probability distribution over the conversion factors between money and points that each of their opponents may have.
+
+The problem here is that, as a player in the game, it is not just our opponents' conversion factors that we need to model. We also need to model our opponents' beliefs about *our* conversion factor. And it doesn't stop there. We would also need to model our opponents' beliefs about our beliefs about our opponents' beliefs about our conversion factor. And so on, ad infinitum.
+
+Trying to analyse the game this way is going to become impractical very quickly! I'm going to stop here.

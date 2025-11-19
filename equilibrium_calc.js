@@ -1,3 +1,5 @@
+// My attempt at translating equilibrium_calc.py to javascript, with limited javascript knowledge!
+
 function* generate_all_outcomes(n_players) {
 
     function* _generate_all_outcomes(current, current_outcome) {
@@ -80,3 +82,101 @@ class OutcomePolynomial {
         return partial_derivs;
     }
 }
+
+function create_value_polynomial(n_probs, value_function) {
+    const coefs = [];
+    const outcomes = [];
+    for (const outcome of generate_all_outcomes(n_probs)) {
+        let n_eaten = 0;
+        for (const decision of outcome) {
+            if (decision) {
+                n_eaten += 1;
+            }
+        }
+        coefs.push(value_function(n_eaten));
+        outcomes.push(outcome);
+    }
+    return new OutcomePolynomial(outcomes, coefs);
+}
+
+class PlayerValue {
+    static N_PLAYERS = 5;
+
+    constructor(cash_to_points_conversion) {
+        this.cash_to_points_conversion = cash_to_points_conversion;
+    }
+
+    eat_value(n_eaten) {
+        if (n_eaten === 0) {
+            return 6;
+        }
+        else if (n_eaten === 1) {
+            return -1 * ((3 * 6) / 4);
+        }
+        else if (n_eaten === 2) {
+            return -1 * ((2 * 6) / 4);
+        }
+        else if (n_eaten === 3) {
+            return -1 * (6 / 4);
+        }
+        else if (n_eaten === 4) {
+            return this.cash_to_points_conversion;
+        }
+        else {
+            throw new Error('n_eaten does not have an allowed value');
+        }
+    }
+
+    not_eat_value(n_eaten) {
+        if (n_eaten === 0) {
+            return -1 * this.cash_to_points_conversion;
+        }
+        else if (n_eaten === 1) {
+            return -1 * (6 / 4);
+        }
+        else if (n_eaten === 2) {
+            return ((2 * 6) / 4);
+        }
+        else if (n_eaten === 3) {
+            return ((3 * 6) / 4);
+        }
+        else if (n_eaten === 4) {
+            return 6;
+        }
+        else {
+            throw new Error('n_eaten does not have an allowed value');
+        }
+    }
+}
+
+function add_polynomials(poly_a, poly_b) {
+    if (poly_a.coef_array.length !== poly_b.coef_array.length) {
+        throw new Error('Inconsistent coefficient array lengths');
+    }
+    const new_coefs = [];
+    const new_outcomes = [];
+    for (let i = 0;i < poly_a.coef_array.length;i++) {
+        new_outcomes.push([]);
+        for (let j = 0;j < poly_a.outcome_array[i].length;j++) {
+            if (poly_a.outcome_array[i][j] !== poly_b.outcome_array[i][j]) {
+                throw new Error('Polynomials have inconsistent outcome arrays')
+            }
+            new_outcomes[i].push(poly_a.outcome_array[i][j]);
+        }
+        new_coefs.push(poly_a.coef_array[i] + poly_b.coef_array[i]);
+    }
+    return new OutcomePolynomial(new_outcomes, new_coefs);
+}
+
+function equal_value_eqn(n_probs, value_fn_a, value_fn_b) {
+
+    function _sign_reversed_b(x) {
+        return -1 * value_fn_b(x);
+    }
+
+    return add_polynomials(
+        create_value_polynomial(n_probs, value_fn_a),
+        create_value_polynomial(n_probs, _sign_reversed_b),
+    );
+}
+

@@ -1,5 +1,7 @@
 // My attempt at translating equilibrium_calc.py to javascript, with limited javascript knowledge!
 
+import { lusolve } from 'mathjs';
+
 function* generate_all_outcomes(n_players) {
 
     function* _generate_all_outcomes(current, current_outcome) {
@@ -180,3 +182,114 @@ function equal_value_eqn(n_probs, value_fn_a, value_fn_b) {
     );
 }
 
+function newton_rhapson_prep(lhs, all_probs) {
+    // Given an eqn of form lhs=0, with ith eqn having ith prob ommitted, return the derivative matrix
+    // and rhs vector for NR linear solve step.
+
+    const vec_elements = [];
+    const deriv_rows = [];
+    for (let i = 0;i < lhs.length;i++) {
+        const lhs_row = lhs[i];
+        const relevant_probs = all_probs.slice(0, i).concat(all_probs.slice(i+1,all_probs.length))
+        vec_elements.push(-1 * lhs_row.eval(relevant_probs));
+        const deriv_row = lhs_row.deriv(relevant_probs);
+        deriv_rows.push(deriv_row.slice(0, i).concat([0.0]).concat(deriv_row.slice(i, all_probs.length)));
+    }
+
+    return [deriv_rows, vec_elements];
+}
+
+function create_equations_from_values(cash_to_points_conversions) {
+    // Return equations to be solved, along with value equations for each player.
+
+    const eqns = [];
+    const eat_values = [];
+    const not_eat_values = [];
+    for (const conversion of cash_to_points_conversions) {
+        const player = new PlayerValue(conversion);
+        const eqn = equal_value_eqn(conversion.length - 1, player.eat_value, player.not_eat_value);
+        const eat_value = create_value_polynomial(conversion.length - 1, player.eat_value);
+        const not_eat_value = create_value_polynomial(conversion.length - 1, player.not_eat_value);
+        
+        eqns.push(eqn);
+        eat_values.push(eat_value);
+        not_eat_values.push(not_eat_value);
+    }
+    
+    return [eqns, eat_values, not_eat_values];
+}
+
+function apply_mask(arr, mask) {
+    // Apply mask to all dimensions of array
+
+    const out_arr = [];
+    for (let i = 0;i < arr.length;i++) {
+        if (mask[i]) {
+            let val = null;   
+            if (Array.isArray(arr[i])) {
+                val = apply_mask(arr[i], mask);
+            }
+            else {
+                val = arr[i];
+            }
+            out_arr.push(val);
+        }
+    }
+    return out_arr;
+}
+
+function solve(cash_to_points_conversions, starting_probs, exclude_indices) {
+    // Find probabilities that solve equilibrium equations, along with value of game for each player
+
+    const ITERATION_LIMIT = 1000;
+    const TOLERANCE = 10**(-6);
+    
+    const mask = Array(starting_probs.length).fill(true);
+    for (const idx of exclude_indices) {
+        mask[idx] = false;
+    }
+
+    const eqns_and_vals = create_equations_from_values(cash_to_points_conversions);
+    const eqns = eqns_and_vals[0];
+    const eat_vals = eqns_and_vals[1];
+    const not_eat_vals = eqns_and_vals[2];
+
+    const soln = [...starting_probs];
+
+    let soln_found = false;
+    for (let i = 0;i < ITERATION_LIMIT;i++) {
+        const nr_prep = newton_rhapson_prep(eqns, soln);
+        const deriv_masked = apply_mask(nr_prep[0], mask);
+        const rhs_masked = apply_mask(nr_prep[1], mask);
+
+        let below_tolerance = true;
+        for (const val of rhs_masked) {
+            if (Math.abs(val) > TOLERANCE) {
+                below_tolerance = false;
+                break;
+            }
+        }
+        if (below_tolerance) {
+            soln_found = true;
+            break;
+        }
+
+        const update = lusolve(deriv_masked, rhs_masked);
+        let mask_counter = 0;
+        for (let j = 0;j < soln.length;j++) {
+            if (mask[j]) {
+                soln[j] += update[mask_counter];
+                mask_counter++;
+            }
+        }
+    }
+
+    if (!soln_found) {
+        throw new Error('Solution did not converge');
+    }
+
+    const eat_vals_eval = newton_rhapson_prep(eat_vals, soln);
+    const not_eat_vals_eval = newton_rhapson_prep(not_eat_vals, soln);
+
+    return [soln, -1 * eat_vals_eval[1], -1 * not_eat_vals_eval[1]];
+}

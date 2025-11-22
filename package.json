@@ -1,0 +1,28 @@
+{
+  "name": "taskmaster_lame_duck",
+  "version": "1.0.0",
+  "description": "Eat the Lamé duck, or don't eat the Lamé duck (made out of vegan chocolate).",
+  "main": "equilibrium_calc.js",
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobycrisford/taskmaster_lame_duck.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tobycrisford/taskmaster_lame_duck/issues"
+  },
+  "homepage": "https://github.com/tobycrisford/taskmaster_lame_duck#readme",
+  "dependencies": {
+    "mathjs": "^15.1.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.21"
+  }
+}

@@ -14,10 +14,10 @@ function* generate_all_outcomes(n_players) {
             yield [...current_outcome];
         } else {
             current_outcome.push(true);
-            yield* backtrack(current + 1, current_outcome);
+            yield* _generate_all_outcomes(current + 1, current_outcome);
             current_outcome.pop();
             current_outcome.push(false);
-            yield* backtrack(current + 1, current_outcome);
+            yield* _generate_all_outcomes(current + 1, current_outcome);
             current_outcome.pop();
         }
     }
@@ -27,7 +27,7 @@ function* generate_all_outcomes(n_players) {
 
 class OutcomePolynomial {
     constructor(outcome_array, coef_array) {
-        if (this.outcome_array.length !== this.coef_array.length) {
+        if (outcome_array.length !== coef_array.length) {
             throw new Error('Outcome array and coefficient array have inconsistent shapes')
         }
         this.coef_array = coef_array;
@@ -35,7 +35,7 @@ class OutcomePolynomial {
     }
 
     _poly_eval(probs, mask, coef_array) {
-        if (this.outcomes.length !== coef_array.length) {
+        if (this.outcome_array.length !== coef_array.length) {
             throw new Error('Outcome and coefficient array lengths are inconsistent');
         }
         if (mask.length !== probs.length) {
@@ -46,12 +46,12 @@ class OutcomePolynomial {
             if (!(mask[j])) {
                 continue;
             }
-            if (this.outcomes[j].length !== probs.length) {
+            if (this.outcome_array[j].length !== probs.length) {
                 throw new Error('Bad outcome length');
             }
             let prob = 1.0;
             for (let i = 0;i < probs.length;i++) {
-                if (outcomes[j][i]) {
+                if (this.outcome_array[j][i]) {
                     prob *= probs[i];
                 }
                 else {
@@ -69,12 +69,12 @@ class OutcomePolynomial {
 
     deriv(probs) {
         const partial_derivs = [];
-        mask = Array(probs.length).fill(true);
+        const mask = Array(probs.length).fill(true);
         for (let i = 0;i < probs.length;i++) {
             mask[i] = false;
             let deriv_coefs = [...this.coef_array];
-            for (let j = 0;j < this.outcomes.length;j++) {
-                if (!outcomes[j][i]) {
+            for (let j = 0;j < this.outcome_array.length;j++) {
+                if (!this.outcome_array[j][i]) {
                     deriv_coefs[j] *= -1;
                 }
             }
@@ -110,7 +110,7 @@ class PlayerValue {
         this.cash_to_points_conversion = cash_to_points_conversion;
     }
 
-    eat_value(n_eaten) {
+    eat_value = (n_eaten) => {
         if (n_eaten === 0) {
             return 6;
         }
@@ -131,7 +131,7 @@ class PlayerValue {
         }
     }
 
-    not_eat_value(n_eaten) {
+    not_eat_value = (n_eaten) => {
         if (n_eaten === 0) {
             return -1 * this.cash_to_points_conversion;
         }
@@ -209,9 +209,9 @@ function create_equations_from_values(cash_to_points_conversions) {
     const not_eat_values = [];
     for (const conversion of cash_to_points_conversions) {
         const player = new PlayerValue(conversion);
-        const eqn = equal_value_eqn(conversion.length - 1, player.eat_value, player.not_eat_value);
-        const eat_value = create_value_polynomial(conversion.length - 1, player.eat_value);
-        const not_eat_value = create_value_polynomial(conversion.length - 1, player.not_eat_value);
+        const eqn = equal_value_eqn(cash_to_points_conversions.length - 1, player.eat_value, player.not_eat_value);
+        const eat_value = create_value_polynomial(cash_to_points_conversions.length - 1, player.eat_value);
+        const not_eat_value = create_value_polynomial(cash_to_points_conversions.length - 1, player.not_eat_value);
         
         eqns.push(eqn);
         eat_values.push(eat_value);
@@ -318,7 +318,7 @@ function find_all_potential_solns(cash_to_points_conversions, fixed_zeros, fixed
         for (const idx of fixed_ones) {
             initialization_vec[idx] = 1.0;
         }
-        soln_data = solve(cash_to_points_conversions, initialization_vec, exclude_indices);
+        const soln_data = solve(cash_to_points_conversions, initialization_vec, exclude_indices);
         let keep = true;
         for (const prob of soln_data[0]) {
             if ((prob > 1.0 + TOLERANCE) || (prob < 0.0 - TOLERANCE)) {
@@ -373,3 +373,9 @@ function check_soln_validity(soln_data, fixed_zeros, fixed_ones) {
     }
     return valid;
 }
+
+const output_div = document.getElementById('output');
+
+const test_solns = find_all_potential_solns([0,0,0,0,0], [], []);
+output_div.innerText = test_solns.toString();
+console.log(test_solns);

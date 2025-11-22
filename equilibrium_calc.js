@@ -43,14 +43,14 @@ class OutcomePolynomial {
         }
         let result = 0.0;
         for (let j = 0;j < coef_array.length;j++) {
-            if (!(mask[j])) {
-                continue;
-            }
             if (this.outcome_array[j].length !== probs.length) {
                 throw new Error('Bad outcome length');
             }
             let prob = 1.0;
             for (let i = 0;i < probs.length;i++) {
+                if (!mask[i]) {
+                    continue;
+                }
                 if (this.outcome_array[j][i]) {
                     prob *= probs[i];
                 }

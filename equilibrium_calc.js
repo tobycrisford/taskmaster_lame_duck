@@ -292,7 +292,14 @@ function solve(cash_to_points_conversions, starting_probs, exclude_indices) {
     const eat_vals_eval = newton_rhapson_prep(eat_vals, soln);
     const not_eat_vals_eval = newton_rhapson_prep(not_eat_vals, soln);
 
-    return [soln, -1 * eat_vals_eval[1], -1 * not_eat_vals_eval[1]];
+    // Need to flip sign to turn from 'RHS' into value fn
+    for (const arr of [eat_vals_eval[1], not_eat_vals_eval[1]]) {
+        for (let i = 0;i < arr.length;i++) {
+            arr[i] *= -1;
+        }
+    }
+
+    return [soln, eat_vals_eval[1], not_eat_vals_eval[1]];
 }
 
 function find_all_potential_solns(cash_to_points_conversions, fixed_zeros, fixed_ones) {

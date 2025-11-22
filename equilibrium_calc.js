@@ -2,6 +2,8 @@
 
 import { lusolve } from 'mathjs';
 
+const TOLERANCE = 10**(-6);
+
 function* generate_all_outcomes(n_players) {
 
     function* _generate_all_outcomes(current, current_outcome) {
@@ -242,7 +244,6 @@ function solve(cash_to_points_conversions, starting_probs, exclude_indices) {
     // Find probabilities that solve equilibrium equations, along with value of game for each player
 
     const ITERATION_LIMIT = 1000;
-    const TOLERANCE = 10**(-6);
     
     const mask = Array(starting_probs.length).fill(true);
     for (const idx of exclude_indices) {
@@ -292,4 +293,83 @@ function solve(cash_to_points_conversions, starting_probs, exclude_indices) {
     const not_eat_vals_eval = newton_rhapson_prep(not_eat_vals, soln);
 
     return [soln, -1 * eat_vals_eval[1], -1 * not_eat_vals_eval[1]];
+}
+
+function find_all_potential_solns(cash_to_points_conversions, fixed_zeros, fixed_ones) {
+    const N_TRIALS = 100;
+    
+    for (const zero of fixed_zeros) {
+        if (fixed_ones.includes(zero)) {
+            throw new Error('Overlap between zeros and ones');
+        }
+    }
+
+    const exclude_indices = fixed_ones.concat(fixed_zeros);
+
+    const solns = [];
+    for (let i = 0;i < N_TRIALS;i++) {
+        const initialization_vec = [];
+        for (let j = 0;j < cash_to_points_conversions.length;j++) {
+            initialization_vec.push(Math.random());
+        }
+        for (const idx of fixed_zeros) {
+            initialization_vec[idx] = 0.0;
+        }
+        for (const idx of fixed_ones) {
+            initialization_vec[idx] = 1.0;
+        }
+        soln_data = solve(cash_to_points_conversions, initialization_vec, exclude_indices);
+        let keep = true;
+        for (const prob of soln_data[0]) {
+            if ((prob > 1.0 + TOLERANCE) || (prob < 0.0 - TOLERANCE)) {
+                keep = false;
+                break;
+            }
+        }
+        if (!keep) {
+            continue;
+        }
+        for (const existing_soln of solns) {
+            let match = true;
+            for (let j = 0;j < existing_soln[0].length;j++) {
+                if (Math.abs(existing_soln[0][j] - soln_data[0][j]) > TOLERANCE) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                keep = false;
+                break;
+            }
+        }
+        if (keep) {
+            solns.push(soln_data);
+        }
+    }
+
+    return solns;
+}
+
+function check_soln_validity(soln_data, fixed_zeros, fixed_ones) {
+    const soln = soln_data[0];
+    const eat_value = soln_data[1];
+    const not_eat_value = soln_data[2];
+
+    let valid = true;
+    for (const idx of fixed_zeros) {
+        if (eat_value[idx] > not_eat_value[idx] + TOLERANCE) {
+            valid = false;
+            break;
+        }
+    }
+    if (!valid) {
+        return false;
+    }
+    for (const idx of fixed_ones) {
+        if (not_eat_value[idx] > eat_value[idx] + TOLERANCE) {
+            valid = false;
+            break;
+        }
+    }
+    return valid;
 }

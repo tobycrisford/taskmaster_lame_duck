@@ -279,7 +279,7 @@ function solve(cash_to_points_conversions, starting_probs, exclude_indices) {
         let mask_counter = 0;
         for (let j = 0;j < soln.length;j++) {
             if (mask[j]) {
-                soln[j] += update[mask_counter];
+                soln[j] += update[mask_counter][0];
                 mask_counter++;
             }
         }

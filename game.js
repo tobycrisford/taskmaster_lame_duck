@@ -11,6 +11,7 @@ const VALUE_DEFAULT = 0;
 let screen = SCREENS.CHARACTER_SELECT;
 let player_character = null;
 const character_values = {};
+let strategies = null;
 
 function select_character(character) {
     player_character = character;
@@ -61,6 +62,7 @@ function select_values() {
     for (const character of CHARACTERS) {
         character_values[character] = document.getElementById(character + "_value_input").value;
     }
+    strategies = calculate_strategy();
     screen = SCREENS.DUCK_CHOICE;
     draw();
 }
@@ -91,9 +93,34 @@ function draw_value_screen(box) {
     box.appendChild(submit);
 }
 
+function calculate_strategy() {
+    const values = [];
+    const idxs = [];
+    for (let i = 0;i < CHARACTERS.length;i++) {
+        values.push(parseInt(character_values[CHARACTERS[i]]));
+        idxs.push(i);
+    }
+    const all_eat = find_all_potential_solns(values, [], idxs);
+    if (all_eat.length !== 1) {
+        // If we force everyone to eat, there is trivially only one potential solution
+        throw new Error('Something has gone wrong with potential solution finder');
+    }
+    if (check_soln_validity(all_eat[0], [], idxs)) {
+        return all_eat[0][0];
+    }
+
+    const solns = find_all_potential_solns(values, [], []);
+    console.log(solns);
+    if (solns.length !== 1) {
+        throw new Error('Not implemented this possibilit yet');
+    }
+    return solns[0][0];
+}
+
 function draw_duck_choice_screen(box) {
     box.innerHTML = "";
     console.log(character_values);
+    console.log(strategies);
 }
 
 function draw() {

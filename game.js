@@ -7,8 +7,10 @@ const SCREENS = {CHARACTER_SELECT: 0, VALUE_SELECT: 1, DUCK_CHOICE: 2, RESULTS: 
 const VALUE_MAX = 10;
 const VALUE_DEFAULT = 0;
 
+// Game state
 let screen = SCREENS.CHARACTER_SELECT;
 let player_character = null;
+const character_values = {};
 
 function select_character(character) {
     player_character = character;
@@ -46,12 +48,21 @@ function create_value_input(character, description) {
     value_input.setAttribute("max", VALUE_MAX.toString());
     value_input.setAttribute("value", VALUE_DEFAULT.toString());
     value_input.setAttribute("class", "value_slider");
+    value_input.setAttribute("id", character + "_value_input");
     input_container.appendChild(value_input);
     const current_selection = document.createElement("span");
     current_selection.textContent = VALUE_DEFAULT.toString();
     input_container.appendChild(current_selection);
     value_input.oninput = () => {current_selection.textContent = value_input.value};
     return input_container;
+}
+
+function select_values() {
+    for (const character of CHARACTERS) {
+        character_values[character] = document.getElementById(character + "_value_input").value;
+    }
+    screen = SCREENS.DUCK_CHOICE;
+    draw();
 }
 
 function draw_value_screen(box) {
@@ -74,6 +85,15 @@ function draw_value_screen(box) {
         val_input = create_value_input(character, character);
         box.appendChild(val_input);
     }
+    const submit = document.createElement("button");
+    submit.textContent = "Play game";
+    submit.addEventListener("click", select_values);
+    box.appendChild(submit);
+}
+
+function draw_duck_choice_screen(box) {
+    box.innerHTML = "";
+    console.log(character_values);
 }
 
 function draw() {
@@ -83,6 +103,9 @@ function draw() {
     }
     else if (screen === SCREENS.VALUE_SELECT) {
         draw_value_screen(box);
+    }
+    else if (screen === SCREENS.DUCK_CHOICE) {
+        draw_duck_choice_screen(box);
     }
 }
 

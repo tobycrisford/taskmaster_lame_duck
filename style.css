@@ -194,11 +194,6 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-/* Highlight the user's row */
-tr td:first-child {
-    font-weight: bold;
-}
-
 /* --- Animations --- */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -221,4 +216,10 @@ tr td:first-child {
     justify-content: center;/* Center them horizontally */
     flex-wrap: wrap;        /* Allow wrapping on tiny screens */
     width: 100%;
+}
+
+.user-row {
+    font-weight: bold;
+    color: var(--tm-red);
+    background-color: #e6e6e6;
 }

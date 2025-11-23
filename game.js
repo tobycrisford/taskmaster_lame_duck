@@ -297,6 +297,7 @@ function draw_results_screen(box) {
     table.appendChild(header_row);
 
     const top_row = create_character_row(player_character, player_character + " (You)");
+    top_row.setAttribute("class", "user-row");
     table.appendChild(top_row);
     for (const character of CHARACTERS) {
         if (character === player_character) {

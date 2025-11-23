@@ -79,11 +79,13 @@ h1 {
 }
 
 .gametext {
-    font-size: 1.4rem;
-    text-align: center;
-    margin-bottom: 15px;
+    font-size: 1.3rem;
+    text-align: left;       /* Left align the text content */
+    width: 100%;            /* Take up full width of container */
+    max-width: 650px;       /* But don't get too wide (readability) */
+    margin: 0 auto 20px auto; /* Center the block itself vertically/horizontally */
     color: #fff;
-    font-weight: bold;
+    line-height: 1.5;       /* Better spacing for multi-line text */
 }
 
 /* --- Buttons (Generic & Character) --- */

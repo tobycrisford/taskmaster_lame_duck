@@ -388,3 +388,75 @@ export function check_soln_validity(soln_data, fixed_zeros, fixed_ones) {
     return valid;
 }
 
+function find_all_valid_solns(cash_to_points_conversions, fixed_zeros, fixed_ones) {
+    const potential_solns = find_all_potential_solns(cash_to_points_conversions, fixed_zeros, fixed_ones);
+    const valid_solns = [];
+    for (const soln_data of potential_solns) {
+        if (check_soln_validity(soln_data, fixed_zeros, fixed_ones)) {
+            valid_solns.push(soln_data);
+        }
+    }
+    return valid_solns;
+}
+
+function find_a_solution_with_fixed_idxs(cash_to_points_conversions, fixed_zeros, fixed_ones, additional_fixed) {
+    // Iterate through all possible ways of fixing additional_fixed (0 or 1) and look for any solution
+
+    if (additional_fixed.length === 0) {
+        return find_all_valid_solns(cash_to_points_conversions, fixed_zeros, fixed_ones);
+    }
+
+    const next_idx = additional_fixed[additional_fixed.length - 1];
+    additional_fixed.pop();
+    fixed_zeros.push(next_idx);
+    let solns = find_a_solution_with_fixed_idxs(cash_to_points_conversions, fixed_zeros, fixed_ones, additional_fixed);
+    fixed_zeros.pop();
+    if (solns.length > 0) {
+        additional_fixed.push(next_idx);
+        return solns;
+    }
+    fixed_ones.push(next_idx);
+    solns = find_a_solution_with_fixed_idxs(cash_to_points_conversions, fixed_zeros, fixed_ones, additional_fixed);
+    fixed_ones.pop();
+    
+    additional_fixed.push(next_idx);
+    return solns;
+}
+
+function find_a_solution_with_n_fixed_idxs(cash_to_points_conversions, fixed_idxs, n_to_fix) {
+    // Find a solution with n fixed idxs
+
+    if (n_to_fix === 0) {
+        return find_a_solution_with_fixed_idxs(cash_to_points_conversions, [], [], fixed_idxs);
+    }
+
+    let idx = 0;
+    if (fixed_idxs.length > 0) {
+        idx = Math.max(...fixed_idxs) + 1;
+    }
+    if (idx >= cash_to_points_conversions.length) {
+        return [];
+    }
+
+    for (let i = idx;i < cash_to_points_conversions.length;i++) {
+        fixed_idxs.push(i);
+        const solns = find_a_solution_with_n_fixed_idxs(cash_to_points_conversions, fixed_idxs, n_to_fix - 1);
+        fixed_idxs.pop();
+        if (solns.length > 0) {
+            return solns;
+        }
+    }
+}
+
+export function find_a_solution_with_minimal_fixed(cash_to_points_conversions) {
+    // Look for a valid solution with minimal number of fixed strategies
+
+    for (let n_fixed = 0;n_fixed <= cash_to_points_conversions.length;n_fixed++) {
+        const solns = find_a_solution_with_n_fixed_idxs(cash_to_points_conversions, [], n_fixed);
+        if (solns.length > 0) {
+            return solns;
+        }
+    }
+
+    return [];
+}

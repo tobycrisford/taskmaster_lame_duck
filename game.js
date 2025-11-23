@@ -1,4 +1,4 @@
-import {find_all_potential_solns, check_soln_validity} from "./equilibrium_calc.js"
+import {find_all_potential_solns, check_soln_validity, find_a_solution_with_minimal_fixed} from "./equilibrium_calc.js"
 
 const CHARACTERS = ['Ania Magliano', 'Maisie Adam', 'Phil Ellis', 'Reece Shearsmith', 'Sanjeev Bhaskar'];
 const CHAR_INDEX_MAP = {};
@@ -118,7 +118,7 @@ function calculate_strategy() {
         return all_eat[0][0];
     }
 
-    const solns = find_all_potential_solns(values, [], []);
+    const solns = find_a_solution_with_minimal_fixed(values);
     console.log(solns);
     if (solns.length !== 1) {
         throw new Error('Not implemented this possibility yet');

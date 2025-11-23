@@ -1,6 +1,10 @@
 import {find_all_potential_solns, check_soln_validity} from "./equilibrium_calc.js"
 
 const CHARACTERS = ['Ania Magliano', 'Maisie Adam', 'Phil Ellis', 'Reece Shearsmith', 'Sanjeev Bhaskar'];
+const CHAR_INDEX_MAP = {};
+for (let i = 0;i < CHARACTERS.length;i++) {
+    CHAR_INDEX_MAP[CHARACTERS[i]] = i;
+}
 
 const SCREENS = {CHARACTER_SELECT: 0, VALUE_SELECT: 1, DUCK_CHOICE: 2, RESULTS: 3};
 
@@ -188,6 +192,9 @@ function play_round(player_decision) {
             last_cash[i] = 25;
         }
     }
+    else {
+        throw new Error('Points logic is broken');
+    }
 
     for (let i = 0;i < total_points.length;i++) {
         total_points[i] += last_points[i];
@@ -199,6 +206,9 @@ function play_round(player_decision) {
     console.log(last_cash);
     console.log(total_points);
     console.log(total_cash);
+
+    screen = SCREENS.RESULTS;
+    draw();
 }
 
 function draw_duck_choice_screen(box) {
@@ -220,6 +230,67 @@ function draw_duck_choice_screen(box) {
     box.appendChild(not_eat_button);
 }
 
+function add_table_element(table, cell_type, content) {
+    const new_cell = document.createElement(cell_type);
+    new_cell.textContent = content;
+    table.appendChild(new_cell);
+}
+
+function create_character_row(character, name) {
+    const char_idx = CHAR_INDEX_MAP[character];
+
+    const table_row = document.createElement("tr");
+    add_table_element(table_row, "td", name);
+    if (last_move[char_idx]) {
+        add_table_element(table_row, "td", "Eats");
+    }
+    else {
+        add_table_element(table_row, "td", "Doesn't eat");
+    }
+    add_table_element(table_row, "td", last_points[char_idx].toString());
+    add_table_element(table_row, "td", last_cash[char_idx].toString());
+    add_table_element(table_row, "td", total_points[char_idx].toString());
+    add_table_element(table_row, "td", total_cash[char_idx].toString());
+
+    return table_row;
+}
+
+function play_again() {
+    screen = SCREENS.DUCK_CHOICE;
+    draw();
+}
+
+function draw_results_screen(box) {
+    box.innerHTML = "";
+
+    const table = document.createElement("table");
+    const header_row = document.createElement("tr");
+    add_table_element(header_row, "th", "Player");
+    add_table_element(header_row, "th", "Move selected");
+    add_table_element(header_row, "th", "Points received");
+    add_table_element(header_row, "th", "Cash received");
+    add_table_element(header_row, "th", "Total points so far");
+    add_table_element(header_row, "th", "Total cash so far");
+    table.appendChild(header_row);
+
+    const top_row = create_character_row(player_character, player_character + " (You)");
+    table.appendChild(top_row);
+    for (const character of CHARACTERS) {
+        if (character === player_character) {
+            continue;
+        }
+        const row = create_character_row(character, character);
+        table.appendChild(row);
+    }
+
+    box.appendChild(table);
+
+    const play_again_button = document.createElement("button");
+    play_again_button.textContent = "Play another round";
+    play_again_button.addEventListener("click", play_again);
+    box.appendChild(play_again_button);
+}
+
 function draw() {
     const box = document.getElementById("gamebox");
     if (screen === SCREENS.CHARACTER_SELECT) {
@@ -230,6 +301,12 @@ function draw() {
     }
     else if (screen === SCREENS.DUCK_CHOICE) {
         draw_duck_choice_screen(box);
+    }
+    else if (screen === SCREENS.RESULTS) {
+        draw_results_screen(box);
+    }
+    else {
+        throw new Error('Unrecongized screen option');
     }
 }
 

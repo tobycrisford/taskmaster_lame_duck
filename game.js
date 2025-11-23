@@ -22,6 +22,14 @@ const last_cash = Array(CHARACTERS.length).fill(0);
 const total_points = Array(CHARACTERS.length).fill(0);
 const total_cash = Array(CHARACTERS.length).fill(0);
 
+function reset_counters() {
+    for (const arr of [total_points, total_cash]) {
+        for (let i = 0;i < arr.length;i++) {
+            arr[i] = 0;
+        }
+    }
+}
+
 function select_character(character) {
     player_character = character;
     screen = SCREENS.VALUE_SELECT;
@@ -260,6 +268,12 @@ function play_again() {
     draw();
 }
 
+function reset() {
+    reset_counters();
+    screen = SCREENS.CHARACTER_SELECT;
+    draw();
+}
+
 function draw_results_screen(box) {
     box.innerHTML = "";
 
@@ -285,10 +299,20 @@ function draw_results_screen(box) {
 
     box.appendChild(table);
 
+    const button_row = document.createElement("div");
+    button_row.setAttribute("class", "button-row");
+
     const play_again_button = document.createElement("button");
     play_again_button.textContent = "Play another round";
     play_again_button.addEventListener("click", play_again);
-    box.appendChild(play_again_button);
+    button_row.appendChild(play_again_button);
+
+    const reset_button = document.createElement("button");
+    reset_button.textContent = "Reset";
+    reset_button.addEventListener("click", reset);
+    button_row.appendChild(reset_button);
+
+    box.appendChild(button_row);
 }
 
 function draw() {

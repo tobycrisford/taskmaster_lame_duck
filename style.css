@@ -213,3 +213,12 @@ tr td:first-child {
     table { font-size: 0.75rem; }
     th, td { padding: 8px; }
 }
+
+.button-row {
+    display: flex;
+    flex-direction: row;    /* Align children side-by-side */
+    gap: 20px;              /* Space between buttons */
+    justify-content: center;/* Center them horizontally */
+    flex-wrap: wrap;        /* Allow wrapping on tiny screens */
+    width: 100%;
+}

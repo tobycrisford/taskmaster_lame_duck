@@ -325,7 +325,14 @@ export function find_all_potential_solns(cash_to_points_conversions, fixed_zeros
         for (const idx of fixed_ones) {
             initialization_vec[idx] = 1.0;
         }
-        const soln_data = solve(cash_to_points_conversions, initialization_vec, exclude_indices);
+        let soln_data = null;
+        try {
+            soln_data = solve(cash_to_points_conversions, initialization_vec, exclude_indices);
+        }
+        catch (error) {
+            console.log(error);
+            continue;
+        }
         let keep = true;
         for (const prob of soln_data[0]) {
             if ((prob > 1.0 + TOLERANCE) || (prob < 0.0 - TOLERANCE)) {

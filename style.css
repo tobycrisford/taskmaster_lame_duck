@@ -115,10 +115,65 @@ button:active {
     transform: scale(0.95);
 }
 
-/* Character selection specific layout */
+/* --- The Polaroid Container (The Button) --- */
 .character_button {
-    width: 100%;
-    max-width: 300px;
+    /* Reset default button styles */
+    background-color: #fdf6e3; /* "Paper" white for the border */
+    border: 1px solid #ccc;     /* Subtle edge */
+    color: inherit;
+    cursor: pointer;
+    
+    /* The Polaroid Look */
+    padding: 10px 10px 35px 10px; /* Extra padding at bottom for the "Polaroid" chin */
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.4); /* Deep shadow to lift it off page */
+    border-radius: 2px;
+    
+    /* Initial State: "Pinned" to the board */
+    transform: rotate(-2deg);   /* Slight tilt makes it look natural/messy */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy transition */
+    
+    /* Sizing */
+    min-width: auto; /* Override previous button width */
+    margin: 10px;
+    position: relative;
+}
+
+/* Alternating tilts for a natural messy look */
+.character_button:nth-child(even) {
+    transform: rotate(2deg);
+}
+
+/* --- The Image Inside --- */
+.character_button img {
+    display: block; /* Removes tiny gap at bottom of image */
+    border: 1px solid #333; /* Thin black frame around the photo itself */
+    filter: sepia(0.3) contrast(1.1); /* Slight vintage/TV effect */
+    transition: filter 0.3s ease;
+    object-fit: cover; /* Ensures faces aren't squashed */
+}
+
+/* --- The "Awesome" Hover Effect --- */
+.character_button:hover {
+    /* The "Pick Up" Animation */
+    transform: scale(1.15) rotate(0deg) translateY(-5px); 
+    z-index: 100; /* Brings the hovered card to the very front */
+    
+    /* The Glow Up */
+    background-color: var(--tm-gold); /* The white border turns GOLD */
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5); /* Shadow grows huge */
+    border-color: #aa8c2c;
+}
+
+.character_button:hover img {
+    filter: none; /* Image goes full color/HD on hover */
+    border-color: #000;
+}
+
+/* Focus state for accessibility (Tab key) */
+.character_button:focus {
+    outline: none;
+    border-color: var(--tm-gold);
+    box-shadow: 0 0 0 4px var(--tm-red);
 }
 
 /* --- Sliders / Inputs --- */

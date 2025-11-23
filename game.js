@@ -5,6 +5,13 @@ const CHAR_INDEX_MAP = {};
 for (let i = 0;i < CHARACTERS.length;i++) {
     CHAR_INDEX_MAP[CHARACTERS[i]] = i;
 }
+const CHAR_IMAGE_MAP = {
+    "Ania Magliano": "./imgs/Ania_Magliano.webp",
+    "Maisie Adam": "./imgs/Maisie_Adam.jpg",
+    "Phil Ellis": "./imgs/Phil_Ellis.webp",
+    "Reece Shearsmith": "./imgs/Reece_Shearsmith.jpg",
+    "Sanjeev Bhaskar": "./imgs/Sanjeev_Bhaskar.jpg",
+}
 
 const SCREENS = {CHARACTER_SELECT: 0, VALUE_SELECT: 1, DUCK_CHOICE: 2, RESULTS: 3};
 
@@ -47,13 +54,16 @@ function draw_intro_screen(box) {
     box.innerHTML = "";
     const text = create_text("Choose your character:");
     box.appendChild(text);
+    const button_row = document.createElement("div");
+    button_row.setAttribute("class", "button-row");
     for (const character of CHARACTERS) {
         const char_select = document.createElement('button');
         char_select.setAttribute("class", "character_button");
-        char_select.textContent = character;
+        char_select.innerHTML = '<img src="' + CHAR_IMAGE_MAP[character] + '" height=200>';
         char_select.addEventListener("click", () => {select_character(character)});
-        box.appendChild(char_select);
+        button_row.appendChild(char_select);
     }
+    box.appendChild(button_row);
 }
 
 function create_value_input(character, description) {

@@ -244,6 +244,15 @@ function add_table_element(table, cell_type, content) {
     table.appendChild(new_cell);
 }
 
+function format_currency(amount) {
+    if (amount >= 0) {
+        return "£" + amount.toString();
+    }
+    else {
+        return "-£" + Math.abs(amount).toString();
+    }
+}
+
 function create_character_row(character, name) {
     const char_idx = CHAR_INDEX_MAP[character];
 
@@ -256,9 +265,9 @@ function create_character_row(character, name) {
         add_table_element(table_row, "td", "Doesn't eat");
     }
     add_table_element(table_row, "td", last_points[char_idx].toString());
-    add_table_element(table_row, "td", last_cash[char_idx].toString());
+    add_table_element(table_row, "td", format_currency(last_cash[char_idx]));
     add_table_element(table_row, "td", total_points[char_idx].toString());
-    add_table_element(table_row, "td", total_cash[char_idx].toString());
+    add_table_element(table_row, "td", format_currency(total_cash[char_idx]));
 
     return table_row;
 }

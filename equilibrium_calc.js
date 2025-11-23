@@ -302,7 +302,7 @@ function solve(cash_to_points_conversions, starting_probs, exclude_indices) {
     return [soln, eat_vals_eval[1], not_eat_vals_eval[1]];
 }
 
-function find_all_potential_solns(cash_to_points_conversions, fixed_zeros, fixed_ones) {
+export function find_all_potential_solns(cash_to_points_conversions, fixed_zeros, fixed_ones) {
     const N_TRIALS = 100;
     
     for (const zero of fixed_zeros) {
@@ -357,7 +357,7 @@ function find_all_potential_solns(cash_to_points_conversions, fixed_zeros, fixed
     return solns;
 }
 
-function check_soln_validity(soln_data, fixed_zeros, fixed_ones) {
+export function check_soln_validity(soln_data, fixed_zeros, fixed_ones) {
     const soln = soln_data[0];
     const eat_value = soln_data[1];
     const not_eat_value = soln_data[2];
@@ -381,8 +381,3 @@ function check_soln_validity(soln_data, fixed_zeros, fixed_ones) {
     return valid;
 }
 
-const output_div = document.getElementById('output');
-
-const test_solns = find_all_potential_solns([0,0,0,0,0], [], []);
-output_div.innerText = test_solns.toString();
-console.log(test_solns);

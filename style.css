@@ -1,0 +1,213 @@
+/* This file is entirely AI generated! (Only part of this project with AI generated code) */
+
+:root {
+    --tm-red: #b01b2e;
+    --tm-red-dark: #8a1524;
+    --tm-gold: #d4af37;
+    --tm-black: #222222;
+    --tm-paper: #fdf6e3;
+    --tm-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --font-main: 'Courier New', Courier, monospace;
+}
+
+body {
+    background-color: var(--tm-black);
+    font-family: var(--font-main);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- Headers --- */
+h1 {
+    color: var(--tm-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    text-shadow: 2px 2px 0px #000;
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+    border-bottom: 3px solid var(--tm-red);
+    padding-bottom: 10px;
+}
+
+/* --- The "Task" Paper Container (Rules) --- */
+.header-text {
+    background-color: var(--tm-paper);
+    color: #333;
+    padding: 25px;
+    max-width: 800px;
+    border-radius: 2px;
+    box-shadow: var(--tm-shadow);
+    line-height: 1.6;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    border-left: 5px solid var(--tm-red);
+    position: relative;
+}
+
+/* Add a wax seal effect to the paper corner */
+.header-text::before {
+    content: "TASK";
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background-color: var(--tm-red);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 0.8rem;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+    transform: rotate(15deg);
+}
+
+/* --- Game Area --- */
+#gamebox {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.gametext {
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* --- Buttons (Generic & Character) --- */
+button {
+    background-color: var(--tm-red);
+    color: white;
+    border: 2px solid white; /* Wax seal style border */
+    padding: 15px 25px;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--tm-shadow);
+    border-radius: 50px; /* Rounded wax seal look */
+    text-transform: uppercase;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: var(--tm-red-dark);
+    transform: scale(1.05);
+    border-color: var(--tm-gold);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* Character selection specific layout */
+.character_button {
+    width: 100%;
+    max-width: 300px;
+}
+
+/* --- Sliders / Inputs --- */
+.value_input_container {
+    background-color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--tm-gold);
+    margin-bottom: 10px;
+}
+
+.value_slider {
+    flex-grow: 1;
+    margin: 0 15px;
+    -webkit-appearance: none;
+    height: 8px;
+    background: #555;
+    border-radius: 5px;
+    outline: none;
+}
+
+.value_slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: var(--tm-gold);
+    cursor: pointer;
+    border: 2px solid white;
+}
+
+.value_input_container span {
+    font-size: 1.5rem;
+    color: var(--tm-gold);
+    font-weight: bold;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* --- Results Table --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--tm-paper);
+    color: black;
+    box-shadow: var(--tm-shadow);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+th {
+    background-color: var(--tm-black);
+    color: var(--tm-gold);
+    padding: 15px;
+    text-align: left;
+    border-bottom: 4px solid var(--tm-red);
+}
+
+td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Highlight the user's row */
+tr td:first-child {
+    font-weight: bold;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+    h1 { font-size: 1.8rem; }
+    .value_input_container { flex-direction: column; align-items: stretch; gap: 10px; }
+    .value_input_container span { text-align: center; }
+    table { font-size: 0.75rem; }
+    th, td { padding: 8px; }
+}

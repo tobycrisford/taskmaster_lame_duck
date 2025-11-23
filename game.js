@@ -112,7 +112,7 @@ function calculate_strategy() {
     const solns = find_all_potential_solns(values, [], []);
     console.log(solns);
     if (solns.length !== 1) {
-        throw new Error('Not implemented this possibilit yet');
+        throw new Error('Not implemented this possibility yet');
     }
     return solns[0][0];
 }

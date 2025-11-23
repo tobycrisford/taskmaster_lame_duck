@@ -219,10 +219,10 @@ function draw_duck_choice_screen(box) {
     const text_box = create_text("Make your choice now");
     
     const eat_button = document.createElement("button");
-    eat_button.textContent = "Eat the Lame Duck"
+    eat_button.textContent = "Eat the Lamé Duck"
     eat_button.addEventListener("click", () => {play_round(true)});
     const not_eat_button = document.createElement("button");
-    not_eat_button.textContent = "Don't eat the Lame Duck";
+    not_eat_button.textContent = "Don't eat the Lamé Duck";
     not_eat_button.addEventListener("click", () => {play_round(false)});
 
     box.appendChild(text_box);

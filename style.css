@@ -124,7 +124,7 @@ button:active {
     cursor: pointer;
     
     /* The Polaroid Look */
-    padding: 10px 10px 35px 10px; /* Extra padding at bottom for the "Polaroid" chin */
+    padding: 10px 10px 45px 10px; /* Extra padding at bottom for the "Polaroid" chin */
     box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.4); /* Deep shadow to lift it off page */
     border-radius: 2px;
     
@@ -136,6 +136,8 @@ button:active {
     min-width: auto; /* Override previous button width */
     margin: 10px;
     position: relative;
+
+    
 }
 
 /* Alternating tilts for a natural messy look */
@@ -277,4 +279,25 @@ tr:nth-child(even) {
     font-weight: bold;
     color: var(--tm-red);
     background-color: #e6e6e6;
+}
+
+.polaroid-caption {
+    position: absolute;
+    bottom: 10px;       /* Sit 10px up from the bottom edge */
+    left: 0;
+    width: 100%;        /* Span the full width of the photo */
+    text-align: center;
+    color: #222;        /* Dark ink color */
+    font-family: 'Courier New', Courier, monospace; /* Typewriter look */
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase; /* LOOKS LIKE A LABEL MAKER */
+    letter-spacing: 1px;
+    
+    /* Ensure the text doesn't spill out if the name is long */
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 5px;     /* Tiny buffer on sides */
+    box-sizing: border-box;
 }

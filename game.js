@@ -59,7 +59,10 @@ function draw_intro_screen(box) {
     for (const character of CHARACTERS) {
         const char_select = document.createElement('button');
         char_select.setAttribute("class", "character_button");
-        char_select.innerHTML = '<img src="' + CHAR_IMAGE_MAP[character] + '" height=200>';
+        char_select.innerHTML = `
+            <img src="${CHAR_IMAGE_MAP[character]}" height="200" alt="${character}">
+            <span class="polaroid-caption">${character}</span>
+        `;
         char_select.addEventListener("click", () => {select_character(character)});
         button_row.appendChild(char_select);
     }

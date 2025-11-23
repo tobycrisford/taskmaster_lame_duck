@@ -12,6 +12,11 @@ let screen = SCREENS.CHARACTER_SELECT;
 let player_character = null;
 const character_values = {};
 let strategies = null;
+let last_move = null;
+const last_points = Array(CHARACTERS.length).fill(0);
+const last_cash = Array(CHARACTERS.length).fill(0);
+const total_points = Array(CHARACTERS.length).fill(0);
+const total_cash = Array(CHARACTERS.length).fill(0);
 
 function select_character(character) {
     player_character = character;
@@ -117,10 +122,102 @@ function calculate_strategy() {
     return solns[0][0];
 }
 
+function sample_prob(prob) {
+    if (Math.random() < prob) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+function play_round(player_decision) {
+    const player_moves = [];
+    for (let i = 0;i < CHARACTERS.length;i++) {
+        const character = CHARACTERS[i];
+        if (character === player_character) {
+            player_moves.push(player_decision);
+        }
+        else {
+            player_moves.push(sample_prob(strategies[i]));
+        }
+    }
+
+    last_move = player_moves;
+
+    let total_eats = 0;
+    for (const move of player_moves) {
+        if (move) {
+            total_eats += 1;
+        }
+    }
+
+    if (total_eats === 0) {
+        for (let i = 0;i < last_cash.length;i++) {
+            last_points[i] = 0;
+            last_cash[i] = -25;
+        }
+    }
+    else if (total_eats === 1) {
+        for (let i = 0;i < last_points.length;i++) {
+            if (last_move[i]) {
+                last_points[i] = 5;
+                last_cash[i] = 0;
+            }
+            else {
+                last_points[i] = -1;
+                last_cash[i] = 0;
+            }
+        }
+    }
+    else if (total_eats > 1 && total_eats < 5) {
+        for (let i = 0;i < last_points.length;i++) {
+            if (last_move[i]) {
+                last_points[i] = -3;
+                last_cash[i] = 0;
+            }
+            else {
+                last_points[i] = 3;
+                last_cash[i] = 0;
+            }
+        }
+    }
+    else if (total_eats === 5) {
+        for (let i = 0;i < last_points.length;i++) {
+            last_points[i] = -3;
+            last_cash[i] = 25;
+        }
+    }
+
+    for (let i = 0;i < total_points.length;i++) {
+        total_points[i] += last_points[i];
+        total_cash[i] += last_cash[i];
+    }
+
+    console.log(last_move);
+    console.log(last_points);
+    console.log(last_cash);
+    console.log(total_points);
+    console.log(total_cash);
+}
+
 function draw_duck_choice_screen(box) {
     box.innerHTML = "";
     console.log(character_values);
     console.log(strategies);
+
+    const text_box = create_text("Make your choice now");
+    
+    const eat_button = document.createElement("button");
+    eat_button.textContent = "Eat the Lame Duck"
+    eat_button.addEventListener("click", () => {play_round(true)});
+    const not_eat_button = document.createElement("button");
+    not_eat_button.textContent = "Don't eat the Lame Duck";
+    not_eat_button.addEventListener("click", () => {play_round(false)});
+
+    box.appendChild(text_box);
+    box.appendChild(eat_button);
+    box.appendChild(not_eat_button);
 }
 
 function draw() {

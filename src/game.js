@@ -100,10 +100,9 @@ function select_values() {
 function draw_value_screen(box) {
     box.innerHTML = "";
     let text = [];
-    text.push("Your selected character is " + player_character);
+    text.push("Your selected character is " + player_character + ".");
     text.push("How many points would each character be willing to give up in exchange for £25?");
-    text.push("Include your own tradeoff.");
-    text.push("Each player's points/cash tradeoff is common knowledge for all players.");
+    text.push("These values will be common knowledge for all players and will be used to determine each player's strategy.");
     for (const line of text) {
         const textbox = create_text(line);
         box.appendChild(textbox);

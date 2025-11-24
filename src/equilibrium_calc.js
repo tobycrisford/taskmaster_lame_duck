@@ -446,6 +446,8 @@ function find_a_solution_with_n_fixed_idxs(cash_to_points_conversions, fixed_idx
             return solns;
         }
     }
+
+    return [];
 }
 
 export function find_a_solution_with_minimal_fixed(cash_to_points_conversions) {
